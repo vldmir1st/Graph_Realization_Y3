@@ -4,6 +4,8 @@
 
 using namespace std;
 
+//шаблонный тип списка (внешний список “ - Node;
+//внутренние списки “ - Node*)
 template <typename T>
 struct NodeList {
 	T data;
@@ -18,7 +20,10 @@ private:
 
 	Node(int value);
 	void addEdgeToNode(Node* node);
+	void delEdgeToNode(Node* node);
 	void print();
+public:
+	int getValue();
 };
 
 class Graph {
@@ -29,9 +34,9 @@ public:
 	void print();
 	void addNode(int value);
 	void delNode(int value);
-	bool searchNode(int index);
+	Node* searchNode(int value);	//можеть вернуть null
 	void addEdge(int firstNodeValue, int secondNodeValue);
-	void delEdge(int indexFrom, int indexTo);
+	void delEdge(int firstNodeValue, int secondNodeValue);
 	void searchEdge(int indexFrom, int indexTo);
 	void traverse();
 	void printAllIndependentSets();
