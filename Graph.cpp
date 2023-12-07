@@ -1,33 +1,35 @@
-#include "Graph.h"
+п»ї#include "Graph.h"
 
 Graph::Graph() {
 	nodes = nullptr;
 }
 
-void Graph::addNode(int value) {
-	//Добавление вершины в пустой граф
+//Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё РІ РіСЂР°С„Рµ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ С‚Р°РєР°СЏ РІРµСЂС€РёРЅР°, РёРЅР°С‡Рµ - 0
+int Graph::addNode(int value) {
+	//Р”РѕР±Р°РІР»РµРЅРёРµ РІРµСЂС€РёРЅС‹ РІ РїСѓСЃС‚РѕР№ РіСЂР°С„
 	if (nodes == nullptr || value < nodes->data.value) {
 		nodes = new NodeList<Node>{ Node(value), nodes };
-		return;
+		return 0;
 	}
-	//Если первая вершина имеет значение value, то ничего не происходит
-	if (nodes->data.value == value) {
-		cout << "Node with such value already exists in graph" << endl;
-		return;
-	}
+	//Р•СЃР»Рё РїРµСЂРІР°СЏ РІРµСЂС€РёРЅР° РёРјРµРµС‚ Р·РЅР°С‡РµРЅРёРµ value, С‚Рѕ РІС‹С…РѕРґРёРј РёР· РјРµС‚РѕРґРѕРј СЃ РєРѕРґРѕРј РѕС€РёР±РєРё 1
+	if (nodes->data.value == value)
+		return 1;
 
 	NodeList<Node>* nodeListPointer = nodes;
-	//Идем до конца или пока не встретим элемент больше value 
+	//РРґРµРј РґРѕ РєРѕРЅС†Р° РёР»Рё РїРѕРєР° РЅРµ РІСЃС‚СЂРµС‚РёРј СЌР»РµРјРµРЅС‚ Р±РѕР»СЊС€Рµ value 
 	while (nodeListPointer->next != nullptr && nodeListPointer->next->data.value < value)
 		nodeListPointer = nodeListPointer->next;
 	if (nodeListPointer->next != nullptr) {
-		//Если элемент с таким значением уже есть, то в граф новая вершина не добавляется
+		//Р•СЃР»Рё СЌР»РµРјРµРЅС‚ СЃ С‚Р°РєРёРј Р·РЅР°С‡РµРЅРёРµРј СѓР¶Рµ РµСЃС‚СЊ, С‚Рѕ РІ РіСЂР°С„ РЅРѕРІР°СЏ РІРµСЂС€РёРЅР° РЅРµ РґРѕР±Р°РІР»СЏРµС‚СЃСЏ
 		if (nodeListPointer->next->data.value != value)
 			nodeListPointer->next = new NodeList<Node>{ Node(value), nodeListPointer->next };
+		else
+			return 1;
 	}
-	//Добавление в вершины в конец списка
+	//Р”РѕР±Р°РІР»РµРЅРёРµ РІ РІРµСЂС€РёРЅС‹ РІ РєРѕРЅРµС† СЃРїРёСЃРєР°
 	else
 		nodeListPointer->next = new NodeList<Node>{ Node(value), nullptr };
+	return 0;
 }
 
 Node::Node(int value) {
@@ -35,15 +37,11 @@ Node::Node(int value) {
 	connectedNodes = nullptr;
 }
 
-int Node::getValue() {
-	return value;
-}
-
 void Graph::print() {
 	if (nodes != nullptr) {
 		NodeList<Node>* nodeListPointer = nodes;
 		while (nodeListPointer != nullptr) {
-			//Печать nodeListPointer->data и всех связанных с ней вершин
+			//РџРµС‡Р°С‚СЊ nodeListPointer->data Рё РІСЃРµС… СЃРІСЏР·Р°РЅРЅС‹С… СЃ РЅРµР№ РІРµСЂС€РёРЅ
 			nodeListPointer->data.print();
 			nodeListPointer = nodeListPointer->next;
 		}
@@ -67,65 +65,76 @@ void Node::print() {
 		cout << value << endl;
 }
 
-void Graph::addEdge(int firstNodeValue, int secondNodeValue) {
-	Node* firstNode = searchNode(firstNodeValue);
-	Node* secondNode = searchNode(secondNodeValue);
+//Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё С…РѕС‚СЏ Р±С‹ РѕРґРЅР° РІРµСЂС€РёРЅР° РЅРµ Р±С‹Р»Р° РЅР°Р№РґРµРЅР°, РёРЅР°С‡Рµ - 0
+int Graph::addEdge(int firstNodeValue, int secondNodeValue) {
+	Node* firstNode = searchNodeExt(firstNodeValue);
+	Node* secondNode = searchNodeExt(secondNodeValue);
 
 	if (firstNode != nullptr && secondNode != nullptr) {
 		firstNode->addEdgeToNode(secondNode);
 		secondNode->addEdgeToNode(firstNode);
+		return 0;
 	}
-	else 
-		cout << "At least one node wasn't found" << endl;
+	return 1;
 }
 
-void Node::addEdgeToNode(Node* node) {
+// Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё С‚Р°РєРѕРµ СЂРµР±СЂРѕ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, РёРЅР°С‡Рµ - 0
+int Node::addEdgeToNode(Node* node) {
 	NodeList<Node*>* nodeListPointer = connectedNodes;
-	//Добавление в начало списка
+	//Р”РѕР±Р°РІР»РµРЅРёРµ РІ РЅР°С‡Р°Р»Рѕ СЃРїРёСЃРєР°
 	if (nodeListPointer == nullptr || node->value < nodeListPointer->data->value) {
 		connectedNodes = new NodeList<Node*>{ node, connectedNodes };
-		return;
+		return 0;
 	}
-	//Проверка первой вершины
-	if (connectedNodes->data->value == node->value) {
-		cout << "Edge to this node already exists" << endl;
-		return;
-	}
+	//РџСЂРѕРІРµСЂРєР° РїРµСЂРІРѕР№ РІРµСЂС€РёРЅС‹
+	if (connectedNodes->data->value == node->value)
+		//РўР°РєРѕРµ СЂРµР±СЂРѕ СѓР¶Рµ РµСЃС‚СЊ
+		return 1;
 
 	while (nodeListPointer->next != nullptr &&
 		nodeListPointer->next->data->value < node->value)
 		nodeListPointer = nodeListPointer->next;
 
 	if (nodeListPointer->next != nullptr) {
-		//Если дуга к этой вершине уже есть, то ничего не делаем
+		//Р•СЃР»Рё СЂРµР±СЂРѕ Рє СЌС‚РѕР№ РІРµСЂС€РёРЅРµ СѓР¶Рµ РµСЃС‚СЊ, С‚Рѕ РІС‹РґР°РµРј РєРѕРґ РѕС€РёР±РєРё 1
 		if (nodeListPointer->next->data->value != node->value)
 			nodeListPointer->next = new NodeList<Node*>{ node, nodeListPointer->next };
 		else
-			cout << "Edge to this node already exists" << endl;
+			return 1;
 	}
 	else
 		nodeListPointer->next = new NodeList<Node*>{ node, nullptr };
+	return 0;
 }
 
-void Graph::delEdge(int firstNodeValue, int secondNodeValue) {
-	Node* firstNode = searchNode(firstNodeValue);
-	Node* secondNode = searchNode(secondNodeValue);
+//Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё С…РѕС‚СЏ Р±С‹ РѕРґРЅР° РёР· РІРµСЂС€РёРЅ РЅРµ Р±С‹Р»Р° РЅР°Р№РґРµРЅР°,
+//РІРѕР·РІСЂР°С‰Р°РµС‚ 2, РµСЃР»Рё С…РѕС‚СЏ Р±С‹ Сѓ РѕРґРЅРѕР№ РІРµСЂС€РёРЅС‹ РЅРµС‚ СЂРµР±РµСЂ
+//РёРЅР°С‡Рµ РІРѕР·РІСЂР°С‰Р°РµС‚ 0
+int Graph::delEdge(int firstNodeValue, int secondNodeValue) {
+	Node* firstNode = searchNodeExt(firstNodeValue);
+	Node* secondNode = searchNodeExt(secondNodeValue);
 
 	if (firstNode != nullptr && secondNode != nullptr) {
-		firstNode->delEdgeToNode(secondNode);
-		secondNode->delEdgeToNode(firstNode);
+		if (firstNode->connectedNodes == nullptr ||
+			secondNode->connectedNodes == nullptr)
+			return 2;
+		else {
+			firstNode->delEdgeToNode(secondNode);
+			secondNode->delEdgeToNode(firstNode);
+			return 0;
+		}
 	}
-	else
-		cout << "At least one node wasn't found" << endl;
+	return 1;
 }
 
-void Node::delEdgeToNode(Node* node) {
-	//Проверка первого элемента
+//Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё РґРѕ РґР°РЅРЅРѕР№ РІРµСЂС€РёРЅС‹ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ СЂРµР±СЂР°, РёРЅР°С‡Рµ 0
+int Node::delEdgeToNode(Node* node) {
+	//РџСЂРѕРІРµСЂРєР° РїРµСЂРІРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
 	if (connectedNodes->data->value == node->value) {
 		NodeList<Node*>* edgeToDelete = connectedNodes;
 		connectedNodes = connectedNodes->next;
 		delete(edgeToDelete);
-		return;
+		return 0;
 	}
 
 	NodeList<Node*>* nodeListPointer = connectedNodes;
@@ -135,21 +144,24 @@ void Node::delEdgeToNode(Node* node) {
 
 	if (nodeListPointer->next != nullptr &&
 		nodeListPointer->next->data->value == node->value) {
-		//Удаление найденного ребра
+		//РЈРґР°Р»РµРЅРёРµ РЅР°Р№РґРµРЅРЅРѕРіРѕ СЂРµР±СЂР°
 		NodeList<Node*>* edgeToDelete = nodeListPointer->next;
 		nodeListPointer->next = nodeListPointer->next->next;
 		delete(edgeToDelete);
+		return 0;
 	}
-	//До этой вершины не было ребра
-	else
-		cout << "Edge to this node doesn't exist" << endl;
+	return 1;
 }
 
-Node* Graph::searchNode(int value) {
-	if (nodes == nullptr) {
-		cout << "Graph is empty" << endl;
+bool Graph::searchNode(int value) {
+	if (searchNodeExt(value) != nullptr)
+		return true;
+	return false;
+}
+
+Node* Graph::searchNodeExt(int value) {
+	if (nodes == nullptr)
 		return nullptr;
-	}
 	NodeList<Node>* nodeListPointer = nodes;
 	while (nodeListPointer != nullptr && nodeListPointer->data.value < value)
 		nodeListPointer = nodeListPointer->next;
@@ -159,38 +171,43 @@ Node* Graph::searchNode(int value) {
 		return nullptr;
 }
 
-void Graph::delNode(int value) {
+//Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё РІ РіСЂР°С„Рµ РЅРµС‚ С‚Р°РєРѕР№ РІРµСЂС€РёРЅС‹, РёРЅР°С‡Рµ 0
+int Graph::delNode(int value) {
 	if (nodes != nullptr) {
 		NodeList<Node>* listElementToDelete = nullptr;
-		//Проверка первого элемента списка
+		//РџСЂРѕРІРµСЂРєР° РїРµСЂРІРѕРіРѕ СЌР»РµРјРµРЅС‚Р° СЃРїРёСЃРєР°
 		if (nodes->data.value == value) {
 			listElementToDelete = nodes;
 			nodes = nodes->next;
 		}
-		//Поиск по списку
+		//РџРѕРёСЃРє РїРѕ СЃРїРёСЃРєСѓ
 		else {
 			NodeList<Node>* nodeListPointer = nodes;
 			while (nodeListPointer->next != nullptr &&
 				nodeListPointer->next->data.value < value)
 				nodeListPointer = nodeListPointer->next;
-			//Проверка на то, что выход из цикла произошел по
-			//причине нахождения нужной вершины.
-			//Если это она, то запоминаем ее и перекидываем ссылки в списке
+			//РџСЂРѕРІРµСЂРєР° РЅР° С‚Рѕ, С‡С‚Рѕ РІС‹С…РѕРґ РёР· С†РёРєР»Р° РїСЂРѕРёР·РѕС€РµР» РїРѕ
+			//РїСЂРёС‡РёРЅРµ РЅР°С…РѕР¶РґРµРЅРёСЏ РЅСѓР¶РЅРѕР№ РІРµСЂС€РёРЅС‹.
+			//Р•СЃР»Рё СЌС‚Рѕ РѕРЅР°, С‚Рѕ Р·Р°РїРѕРјРёРЅР°РµРј РµРµ Рё РїРµСЂРµРєРёРґС‹РІР°РµРј СЃСЃС‹Р»РєРё РІ СЃРїРёСЃРєРµ
 			if (nodeListPointer->next != nullptr &&
 				nodeListPointer->next->data.value == value) {
 				listElementToDelete = nodeListPointer->next;
 				nodeListPointer->next = nodeListPointer->next->next;
 			}
-			//Вершина с этим значением не была найдена - выход из метода
-			else {
-				cout << "There is no node with such value" << endl;
-				return;
-			}
+			//Р’РµСЂС€РёРЅР° СЃ СЌС‚РёРј Р·РЅР°С‡РµРЅРёРµРј РЅРµ Р±С‹Р»Р° РЅР°Р№РґРµРЅР° - РІС‹С…РѕРґ РёР· РјРµС‚РѕРґР°
+			else
+				return 1;
 		}
-		//Удаление всех ребер, связанных с удаляемой вершиной
+		//РЈРґР°Р»РµРЅРёРµ РІСЃРµС… СЂРµР±РµСЂ, СЃРІСЏР·Р°РЅРЅС‹С… СЃ СѓРґР°Р»СЏРµРјРѕР№ РІРµСЂС€РёРЅРѕР№
 		if (listElementToDelete->data.connectedNodes != nullptr) {
 			NodeList<Node*>* edgeToDelete;
 			while (listElementToDelete->data.connectedNodes != nullptr) {
+				//Р•СЃР»Рё СЂРµР±СЂРѕ СЏРІР»СЏРµС‚СЃСЏ РїРµС‚Р»С‘Р№, С‚Рѕ РїСЂРѕСЃС‚Рѕ РїСЂРѕРїСѓСЃРєР°РµРј
+				if (listElementToDelete->data.connectedNodes->data->value == value) {
+					listElementToDelete->data.connectedNodes =
+						listElementToDelete->data.connectedNodes->next;
+					continue;
+				}
 				edgeToDelete = listElementToDelete->data.connectedNodes;
 				listElementToDelete->data.connectedNodes =
 					listElementToDelete->data.connectedNodes->next;
@@ -198,11 +215,11 @@ void Graph::delNode(int value) {
 				delete(edgeToDelete);
 			}
 		}
-		//Непосредственно удаление вершины
+		//РќРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ СѓРґР°Р»РµРЅРёРµ РІРµСЂС€РёРЅС‹
 		listElementToDelete->next = nullptr;
 		delete(listElementToDelete);
+		return 0;
 	}
-	//Пустой граф
-	else
-		cout << "You can't delete node with such value - graph is empty" << endl;
+	//РџСѓСЃС‚РѕР№ РіСЂР°С„
+	return 1;
 }

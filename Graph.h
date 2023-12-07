@@ -1,14 +1,14 @@
-#pragma once
+п»ї#pragma once
 
 #include <iostream>
 
 using namespace std;
 
-//Реализация графа через список смежности
-//Внешний и внутренние списки упорядочены
+//Р РµР°Р»РёР·Р°С†РёСЏ РіСЂР°С„Р° С‡РµСЂРµР· СЃРїРёСЃРѕРє СЃРјРµР¶РЅРѕСЃС‚Рё
+//Р’РЅРµС€РЅРёР№ Рё РІРЅСѓС‚СЂРµРЅРЅРёРµ СЃРїРёСЃРєРё СѓРїРѕСЂСЏРґРѕС‡РµРЅС‹
 
-//Шаблонный тип списка (внешний список Т - Node;
-//Внутренние списки Т - Node*)
+//РЁР°Р±Р»РѕРЅРЅС‹Р№ С‚РёРї СЃРїРёСЃРєР° (РІРЅРµС€РЅРёР№ СЃРїРёСЃРѕРє Рў - Node;
+//Р’РЅСѓС‚СЂРµРЅРЅРёРµ СЃРїРёСЃРєРё Рў - Node*)
 template <typename T>
 struct NodeList {
 	T data;
@@ -22,24 +22,24 @@ private:
 	NodeList<Node*>* connectedNodes;
 
 	Node(int value);
-	void addEdgeToNode(Node* node);
-	void delEdgeToNode(Node* node);
+	int addEdgeToNode(Node* node);	//РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕРґ РѕС€РёР±РєРё
+	int delEdgeToNode(Node* node);	//РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕРґ РѕС€РёР±РєРё
 	void print();
-public:
-	int getValue();
 };
 
 class Graph {
 private:
 	NodeList<Node>* nodes;
+	Node* searchNodeExt(int value);		//РјРѕР¶РµС‚СЊ РІРµСЂРЅСѓС‚СЊ null
+	//?? searchEdge(int firstNodeValue, int secondNodeValue);
 public:
 	Graph();
 	void print();
-	void addNode(int value);
-	void delNode(int value);
-	Node* searchNode(int value);	//можеть вернуть null
-	void addEdge(int firstNodeValue, int secondNodeValue);
-	void delEdge(int firstNodeValue, int secondNodeValue);
+	int addNode(int value);		//РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕРґ РѕС€РёР±РєРё
+	int delNode(int value);		//РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕРґ РѕС€РёР±РєРё
+	bool searchNode(int value);
+	int addEdge(int firstNodeValue, int secondNodeValue);	//РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕРґ РѕС€РёР±РєРё
+	int delEdge(int firstNodeValue, int secondNodeValue);	//РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕРґ РѕС€РёР±РєРё
 	bool searchEdge(int firstNodeValue, int secondNodeValue);
 	void traverse();
 	void printAllIndependentSets();
