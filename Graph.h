@@ -4,8 +4,11 @@
 
 using namespace std;
 
-//шаблонный тип списка (внешний список Т - Node;
-//внутренние списки Т - Node*)
+//Реализация графа через список смежности
+//Внешний и внутренние списки упорядочены
+
+//Шаблонный тип списка (внешний список Т - Node;
+//Внутренние списки Т - Node*)
 template <typename T>
 struct NodeList {
 	T data;
@@ -37,7 +40,7 @@ public:
 	Node* searchNode(int value);	//можеть вернуть null
 	void addEdge(int firstNodeValue, int secondNodeValue);
 	void delEdge(int firstNodeValue, int secondNodeValue);
-	void searchEdge(int indexFrom, int indexTo);
+	bool searchEdge(int firstNodeValue, int secondNodeValue);
 	void traverse();
 	void printAllIndependentSets();
 };
