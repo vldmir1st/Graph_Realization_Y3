@@ -223,3 +223,20 @@ int Graph::delNode(int value) {
 	//Пустой граф
 	return 1;
 }
+
+//Возвращает false, если между двумя вершинами с
+//заданными значениями не имеется ребра или
+//если хотя бы одной из вершин нет. Иначе возвращает true
+bool Graph::searchEdge(int firstNodeValue, int secondNodeValue) {
+	Node* firstNode = searchNodeExt(firstNodeValue);
+	if (firstNode == nullptr || searchNodeExt(secondNodeValue) == nullptr)
+		return false;
+	if (firstNode->connectedNodes == nullptr)
+		return false;
+	NodeList<Node*>* edgeIterator = firstNode->connectedNodes;
+	while (edgeIterator != nullptr && edgeIterator->data->value != secondNodeValue)
+		edgeIterator = edgeIterator->next;
+	if (edgeIterator != nullptr)
+		return true;
+	return false;
+}

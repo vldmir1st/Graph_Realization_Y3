@@ -31,7 +31,6 @@ class Graph {
 private:
 	NodeList<Node>* nodes;
 	Node* searchNodeExt(int value);		//можеть вернуть null
-	//?? searchEdge(int firstNodeValue, int secondNodeValue);
 public:
 	Graph();
 	void print();
