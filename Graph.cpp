@@ -34,6 +34,7 @@ int Graph::addNode(int value) {
 
 Node::Node(int value) {
 	this->value = value;
+	isMarked = false;
 	connectedNodes = nullptr;
 }
 
@@ -239,4 +240,115 @@ bool Graph::searchEdge(int firstNodeValue, int secondNodeValue) {
 	if (edgeIterator != nullptr)
 		return true;
 	return false;
+}
+
+//не доделан
+void Graph::traverse() {
+	if (nodes != nullptr) {
+		NodeList<Node>* nodeListPointer = nodes;
+	}
+}
+
+void Graph::printAllMaxIndependentSets() {
+	cout << "Max independent sets:\n";
+	if (nodes != nullptr) {
+		NodeList<int>* currentIndependentSet = nullptr;
+		NodeList<int>* candidates = nullptr;
+		fillCandidates(candidates);
+		NodeList<int>* usedNodes = nullptr;
+		extendIndependentSet(currentIndependentSet, candidates, usedNodes);
+	}
+}
+
+void Graph::fillCandidates(NodeList<int>* &candidates) {
+	candidates = new NodeList<int>{ nodes->data.value, nullptr };
+	NodeList<Node>* nodeListPointer = nodes->next;
+	while (nodeListPointer != nullptr) {
+		candidates = new NodeList<int>{ nodeListPointer->data.value, candidates };
+		nodeListPointer = nodeListPointer->next;
+	}
+}
+
+void Graph::extendIndependentSet(NodeList<int>* &currentIndependentSet,
+	NodeList<int>* &candidates, NodeList<int>* &usedNodes) {
+	while (candidates != nullptr && check(candidates, usedNodes)) {
+		addNodeValueToSet(currentIndependentSet, candidates->data);
+		auto newCandidates = makeNewSet(candidates, currentIndependentSet->data);
+		auto newUsedNodes = makeNewSet(usedNodes, currentIndependentSet->data);
+		if (newCandidates == nullptr && newUsedNodes == nullptr)
+			printMaxIndependentSet(currentIndependentSet);
+		else {
+			extendIndependentSet(currentIndependentSet, newCandidates, newUsedNodes);
+		}
+		addNodeValueToSet(usedNodes, candidates->data);
+		removeLastAddedElement(candidates);
+		removeLastAddedElement(currentIndependentSet);
+	}
+	clearSet(candidates);
+	clearSet(usedNodes);
+}
+
+bool Graph::check(NodeList<int>* candidates, NodeList<int>* usedNodes) {
+	NodeList<int>* nodeListPointer1 = usedNodes;
+	while (nodeListPointer1 != nullptr) {
+		NodeList<int>* nodeListPointer2 = candidates;
+		bool flag = true;
+		while (nodeListPointer2 != nullptr) {
+			if (searchEdge(nodeListPointer1->data, nodeListPointer2->data)) {
+				flag = false;
+				break;
+			}
+			nodeListPointer2 = nodeListPointer2->next;
+		}
+		if (flag) return false;
+		nodeListPointer1 = nodeListPointer1->next;
+	}
+	return true;
+}
+
+NodeList<int>* Graph::makeNewSet(NodeList<int>* oldOne, int nodeValue) {
+	NodeList<int>* newSet = nullptr;
+	NodeList<int>* nodeListPointer = oldOne;
+	while (nodeListPointer != nullptr) {
+		if (!searchEdge(nodeListPointer->data, nodeValue) &&
+			nodeListPointer->data != nodeValue)
+			addNodeValueToSet(newSet, nodeListPointer->data);
+		nodeListPointer = nodeListPointer->next;
+	}
+	return newSet;
+}
+
+void Graph::printMaxIndependentSet(NodeList<int>* set) {
+	NodeList<int>* nodeListPointer = set;
+	while (nodeListPointer != nullptr) {
+		cout << nodeListPointer->data << " ";
+		nodeListPointer = nodeListPointer->next;
+	}
+	cout << "\n";
+}
+
+void Graph::addNodeValueToSet(NodeList<int>* &set, int nodeValue) {
+	if (set == nullptr)
+		set = new NodeList<int>{ nodeValue, nullptr };
+	else
+		set = new NodeList<int>{ nodeValue, set };
+}
+
+void Graph::removeLastAddedElement(NodeList<int>* &set) {
+	NodeList<int>* toDelete = set;
+	set = set->next;
+	toDelete->next = nullptr;
+	delete(toDelete);
+}
+
+void Graph::clearSet(NodeList<int>* &set) {
+	if (set != nullptr) {
+		NodeList<int>* toDel;
+		while (set != nullptr) {
+			toDel = set;
+			set = set->next;
+			toDel->next = nullptr;
+			delete(toDel);
+		}
+	}
 }

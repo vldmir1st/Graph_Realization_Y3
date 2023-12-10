@@ -19,6 +19,7 @@ class Node {
 	friend class Graph;
 private:
 	int value;
+	bool isMarked;
 	NodeList<Node*>* connectedNodes;
 
 	Node(int value);
@@ -31,6 +32,19 @@ class Graph {
 private:
 	NodeList<Node>* nodes;
 	Node* searchNodeExt(int value);		//можеть вернуть null
+	
+	//Методы для нахождения максимальных независимых множеств
+	
+	//
+	void fillCandidates(NodeList<int>* &candidates);
+	void extendIndependentSet(NodeList<int>* &currentIndependentSet,
+		NodeList<int>* &candidates, NodeList<int>* &usedNodes);
+	bool check(NodeList<int>* candidates, NodeList<int>* usedNodes);
+	NodeList<int>* makeNewSet(NodeList<int>* oldOne, int nodeValue);
+	void printMaxIndependentSet(NodeList<int>* set);
+	void addNodeValueToSet(NodeList<int>* &set, int nodeValue);
+	void removeLastAddedElement(NodeList<int>* &set);
+	void clearSet(NodeList<int>* &set);
 public:
 	Graph();
 	void print();
@@ -40,6 +54,6 @@ public:
 	int addEdge(int firstNodeValue, int secondNodeValue);	//возвращает код ошибки
 	int delEdge(int firstNodeValue, int secondNodeValue);	//возвращает код ошибки
 	bool searchEdge(int firstNodeValue, int secondNodeValue);
-	void traverse();
-	void printAllIndependentSets();
+	void traverse();	//обход в ширину с использованием очереди
+	void printAllMaxIndependentSets();
 };
