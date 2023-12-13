@@ -19,7 +19,7 @@ class Node {
 	friend class Graph;
 private:
 	int value;
-	bool isMarked;
+	bool isMarked;	//необходимо для обхода
 	NodeList<Node*>* connectedNodes;
 
 	Node(int value);
@@ -33,7 +33,8 @@ private:
 	NodeList<Node>* nodes;
 	Node* searchNodeExt(int value);		//можеть вернуть null
 	
-	//Методы для нахождения максимальных независимых множеств
+	//Методы, используемые в нахождении
+	//максимальных независимых множеств
 	void fillCandidates(NodeList<int>* &candidates);
 	void extendIndependentSet(NodeList<int>* &currentIndependentSet,
 		NodeList<int>* &candidates, NodeList<int>* &usedNodes);
@@ -44,7 +45,9 @@ private:
 	void removeLastAddedElement(NodeList<int>* &set);
 	void clearSet(NodeList<int>* &set);
 
-
+	//Метод, используемый в обходе графа
+	void addUnmarkedNodesToQueue(NodeList<Node*>* &queueHead,
+		NodeList<Node*>* &queueTail);
 public:
 	Graph();
 	void print();

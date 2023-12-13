@@ -250,16 +250,7 @@ void Graph::traverse() {
 		queueTail->data->isMarked = true;
 		while (queueHead != nullptr && queueTail != nullptr) {
 			cout << queueHead->data->value << " ";
-			auto connectedNodesIterator = queueHead->data->connectedNodes;
-			while (connectedNodesIterator != nullptr) {
-				if (!connectedNodesIterator->data->isMarked) {
-					queueTail->next =
-						new NodeList<Node*>{ connectedNodesIterator->data, nullptr };
-					queueTail = queueTail->next;
-					queueTail->data->isMarked = true;
-				}
-				connectedNodesIterator = connectedNodesIterator->next;
-			}
+			addUnmarkedNodesToQueue(queueHead, queueTail);
 			auto toDelete = queueHead;
 			if (queueHead == queueTail)
 				queueTail = queueTail->next;
@@ -267,6 +258,20 @@ void Graph::traverse() {
 			toDelete->data, toDelete->next = nullptr;
 			delete(toDelete);
 		}
+	}
+}
+
+void Graph::addUnmarkedNodesToQueue(NodeList<Node*>*& queueHead,
+	NodeList<Node*>*& queueTail) {
+	auto connectedNodesIterator = queueHead->data->connectedNodes;
+	while (connectedNodesIterator != nullptr) {
+		if (!connectedNodesIterator->data->isMarked) {
+			queueTail->next =
+				new NodeList<Node*>{ connectedNodesIterator->data, nullptr };
+			queueTail = queueTail->next;
+			queueTail->data->isMarked = true;
+		}
+		connectedNodesIterator = connectedNodesIterator->next;
 	}
 }
 
