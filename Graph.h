@@ -34,8 +34,6 @@ private:
 	Node* searchNodeExt(int value);		//можеть вернуть null
 	
 	//Методы для нахождения максимальных независимых множеств
-	
-	//
 	void fillCandidates(NodeList<int>* &candidates);
 	void extendIndependentSet(NodeList<int>* &currentIndependentSet,
 		NodeList<int>* &candidates, NodeList<int>* &usedNodes);
@@ -45,6 +43,8 @@ private:
 	void addNodeValueToSet(NodeList<int>* &set, int nodeValue);
 	void removeLastAddedElement(NodeList<int>* &set);
 	void clearSet(NodeList<int>* &set);
+
+
 public:
 	Graph();
 	void print();

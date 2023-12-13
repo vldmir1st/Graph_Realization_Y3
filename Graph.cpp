@@ -242,10 +242,31 @@ bool Graph::searchEdge(int firstNodeValue, int secondNodeValue) {
 	return false;
 }
 
-//не доделан
+//Обход в ширину с использованием очереди
 void Graph::traverse() {
 	if (nodes != nullptr) {
-		NodeList<Node>* nodeListPointer = nodes;
+		auto queueHead = new NodeList<Node*>{ &nodes->data, nullptr };
+		auto queueTail = queueHead;
+		queueTail->data->isMarked = true;
+		while (queueHead != nullptr && queueTail != nullptr) {
+			cout << queueHead->data->value << " ";
+			auto connectedNodesIterator = queueHead->data->connectedNodes;
+			while (connectedNodesIterator != nullptr) {
+				if (!connectedNodesIterator->data->isMarked) {
+					queueTail->next =
+						new NodeList<Node*>{ connectedNodesIterator->data, nullptr };
+					queueTail = queueTail->next;
+					queueTail->data->isMarked = true;
+				}
+				connectedNodesIterator = connectedNodesIterator->next;
+			}
+			auto toDelete = queueHead;
+			if (queueHead == queueTail)
+				queueTail = queueTail->next;
+			queueHead = queueHead->next;
+			toDelete->data, toDelete->next = nullptr;
+			delete(toDelete);
+		}
 	}
 }
 
