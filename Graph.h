@@ -31,8 +31,11 @@ private:
 class Graph {
 private:
 	NodeList<Node>* nodes;
+
 	Node* searchNodeExt(int value);		//можеть вернуть null
-	
+	//Методы, используемые в удалении вершины
+	NodeList<Node>* searchNodeInOrderToDeleteIt(int value);
+	void deleteAllEdgesConnectedWithNode(NodeList<Node>* listElementToDelete);
 	//Методы, используемые в нахождении
 	//максимальных независимых множеств
 	void fillCandidates(NodeList<int>* &candidates);
@@ -44,7 +47,6 @@ private:
 	void addNodeValueToSet(NodeList<int>* &set, int nodeValue);
 	void removeLastAddedElement(NodeList<int>* &set);
 	void clearSet(NodeList<int>* &set);
-
 	//Метод, используемый в обходе графа
 	void addUnmarkedNodesToQueue(NodeList<Node*>* &queueHead,
 		NodeList<Node*>* &queueTail);

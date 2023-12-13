@@ -175,47 +175,11 @@ Node* Graph::searchNodeExt(int value) {
 //Возвращает 1, если в графе нет такой вершины, иначе 0
 int Graph::delNode(int value) {
 	if (nodes != nullptr) {
-		NodeList<Node>* listElementToDelete = nullptr;
-		//Проверка первого элемента списка
-		if (nodes->data.value == value) {
-			listElementToDelete = nodes;
-			nodes = nodes->next;
-		}
-		//Поиск по списку
-		else {
-			NodeList<Node>* nodeListPointer = nodes;
-			while (nodeListPointer->next != nullptr &&
-				nodeListPointer->next->data.value < value)
-				nodeListPointer = nodeListPointer->next;
-			//Проверка на то, что выход из цикла произошел по
-			//причине нахождения нужной вершины.
-			//Если это она, то запоминаем ее и перекидываем ссылки в списке
-			if (nodeListPointer->next != nullptr &&
-				nodeListPointer->next->data.value == value) {
-				listElementToDelete = nodeListPointer->next;
-				nodeListPointer->next = nodeListPointer->next->next;
-			}
-			//Вершина с этим значением не была найдена - выход из метода
-			else
-				return 1;
-		}
-		//Удаление всех ребер, связанных с удаляемой вершиной
-		if (listElementToDelete->data.connectedNodes != nullptr) {
-			NodeList<Node*>* edgeToDelete;
-			while (listElementToDelete->data.connectedNodes != nullptr) {
-				//Если ребро является петлёй, то просто пропускаем
-				if (listElementToDelete->data.connectedNodes->data->value == value) {
-					listElementToDelete->data.connectedNodes =
-						listElementToDelete->data.connectedNodes->next;
-					continue;
-				}
-				edgeToDelete = listElementToDelete->data.connectedNodes;
-				listElementToDelete->data.connectedNodes =
-					listElementToDelete->data.connectedNodes->next;
-				edgeToDelete->data->delEdgeToNode(&listElementToDelete->data);
-				delete(edgeToDelete);
-			}
-		}
+		NodeList<Node>* listElementToDelete = searchNodeInOrderToDeleteIt(value);
+		//Вершина не была найдена
+		if (listElementToDelete == nullptr)
+			return 1;
+		deleteAllEdgesConnectedWithNode(listElementToDelete);
 		//Непосредственно удаление вершины
 		listElementToDelete->next = nullptr;
 		delete(listElementToDelete);
@@ -223,6 +187,50 @@ int Graph::delNode(int value) {
 	}
 	//Пустой граф
 	return 1;
+}
+
+NodeList<Node>* Graph::searchNodeInOrderToDeleteIt(int value) {
+	NodeList<Node>* listElementToDelete = nullptr;
+	//Проверка первого элемента списка
+	if (nodes->data.value == value) {
+		listElementToDelete = nodes;
+		nodes = nodes->next;
+	}
+	//Поиск по оставшейся части списка
+	else {
+		NodeList<Node>* nodeListPointer = nodes;
+		while (nodeListPointer->next != nullptr &&
+			nodeListPointer->next->data.value < value)
+			nodeListPointer = nodeListPointer->next;
+		//Проверка на то, что выход из цикла произошел по
+		//причине нахождения нужной вершины.
+		//Если это она, то запоминаем ее и перекидываем ссылки в списке
+		if (nodeListPointer->next != nullptr &&
+			nodeListPointer->next->data.value == value) {
+			listElementToDelete = nodeListPointer->next;
+			nodeListPointer->next = nodeListPointer->next->next;
+		}
+	}
+	return listElementToDelete;
+}
+
+void Graph::deleteAllEdgesConnectedWithNode(NodeList<Node>* listElementToDelete) {
+	if (listElementToDelete->data.connectedNodes != nullptr) {
+		NodeList<Node*>* edgeToDelete;
+		while (listElementToDelete->data.connectedNodes != nullptr) {
+			//Если ребро является петлёй, то просто пропускаем
+			if (listElementToDelete->data.connectedNodes->data == &listElementToDelete->data) {
+				listElementToDelete->data.connectedNodes =
+					listElementToDelete->data.connectedNodes->next;
+				continue;
+			}
+			edgeToDelete = listElementToDelete->data.connectedNodes;
+			listElementToDelete->data.connectedNodes =
+				listElementToDelete->data.connectedNodes->next;
+			edgeToDelete->data->delEdgeToNode(&listElementToDelete->data);
+			delete(edgeToDelete);
+		}
+	}
 }
 
 //Возвращает false, если между двумя вершинами с
