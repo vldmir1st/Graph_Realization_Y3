@@ -109,18 +109,20 @@ int Node::addEdgeToNode(Node* node) {
 }
 
 //Возвращает 1, если хотя бы одна из вершин не была найдена,
-//возвращает 2, если хотя бы у одной вершины нет ребер
+//возвращает 2, если между вершинами нет ребра
 //иначе возвращает 0
 int Graph::delEdge(int firstNodeValue, int secondNodeValue) {
 	Node* firstNode = searchNodeExt(firstNodeValue);
 	Node* secondNode = searchNodeExt(secondNodeValue);
 
 	if (firstNode != nullptr && secondNode != nullptr) {
+		//предварительная проверка на наличие ребер у обоих вершин
 		if (firstNode->connectedNodes == nullptr ||
 			secondNode->connectedNodes == nullptr)
 			return 2;
 		else {
-			firstNode->delEdgeToNode(secondNode);
+			if (firstNode->delEdgeToNode(secondNode) == 1)
+				return 2;
 			secondNode->delEdgeToNode(firstNode);
 			return 0;
 		}
