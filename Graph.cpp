@@ -252,21 +252,29 @@ bool Graph::searchEdge(int firstNodeValue, int secondNodeValue) {
 	return false;
 }
 
-//Обход в ширину с использованием очереди
+//Обход в ширину с использованием очереди.
+//Обход начинается с первой вершины в списке.
 void Graph::traverse() {
 	if (nodes != nullptr) {
-		auto queueHead = new NodeList<Node*>{ &nodes->data, nullptr };
-		auto queueTail = queueHead;
-		queueTail->data->isMarked = true;
-		while (queueHead != nullptr && queueTail != nullptr) {
-			cout << queueHead->data->value << " ";
-			addUnmarkedNodesToQueue(queueHead, queueTail);
-			auto toDelete = queueHead;
-			if (queueHead == queueTail)
-				queueTail = queueTail->next;
-			queueHead = queueHead->next;
-			toDelete->data, toDelete->next = nullptr;
-			delete(toDelete);
+		auto nodesIterator = nodes;
+		//Этот цикл обеспечивает обход вершин, не достижимых из первой вершины
+		while (nodesIterator != nullptr) {
+			if (!nodesIterator->data.isMarked) {
+				auto queueHead = new NodeList<Node*>{ &nodesIterator->data, nullptr };
+				auto queueTail = queueHead;
+				queueTail->data->isMarked = true;
+				while (queueHead != nullptr && queueTail != nullptr) {
+					cout << queueHead->data->value << " ";
+					addUnmarkedNodesToQueue(queueHead, queueTail);
+					auto toDelete = queueHead;
+					if (queueHead == queueTail)
+						queueTail = queueTail->next;
+					queueHead = queueHead->next;
+					toDelete->data, toDelete->next = nullptr;
+					delete(toDelete);
+				}
+			}
+			nodesIterator = nodesIterator->next;
 		}
 	}
 }
@@ -294,6 +302,7 @@ void Graph::printAllMaxIndependentSets() {
 		NodeList<int>* usedNodes = nullptr;
 		extendIndependentSet(currentIndependentSet, candidates, usedNodes);
 	}
+	cout << "\n";
 }
 
 void Graph::fillCandidates(NodeList<int>* &candidates) {
